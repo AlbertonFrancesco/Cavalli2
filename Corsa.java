@@ -1,6 +1,5 @@
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.channels.Pipe.SourceChannel;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -17,9 +16,9 @@ public class Corsa {
         List<Cavallo> cavalli = new ArrayList<>();
 
         for(int i=0; i< numCav;i++){
-            System.out.println("inseriisci il nome cavallo "+(i+1)+" :");
+            System.out.println("inserisci il nome del cavallo "+(i+1)+" :");
             String nome = scanner.nextLine();
-            System.out.println("Inserisci la velocità di "+ nome+ " metri al secondo");
+            System.out.println("Inserisci la velocità di "+ nome+ " in metri al secondo");
             int velocita= scanner.nextInt();
             scanner.nextLine();
             cavalli.add(new Cavallo (nome,fine,velocita));
@@ -44,10 +43,32 @@ public class Corsa {
 
         terminanti.sort(Comparator.comparingLong(Cavallo::getTempoFine));
         System.out.println("/nClassifica dei primi tre cavalli: ");
-        for(int i=0; i<Math.min(3,terminanti.size());i++){
-            Cavallo cavallo= terminanti.get(i);
-            System.out.println((i+1)+ cavallo.getNome()+" in: "+cavallo.getTempoFine()+" ms.");
+        
+        int posizione = 1;
+        for (Cavallo cavallo : terminanti) {
+         if (cavallo.getTempoFine() != -1 && posizione <= 3) { 
+           System.out.println(posizione + ". " + cavallo.getNome() + " in: " + cavallo.getTempoFine() + " ms.");
+           posizione++;
+    }
+}
+
+       System.out.println("In che file vuoi inserire i dati? ");
+       String nomeF = scanner.nextLine();
+       try (FileWriter file = new FileWriter(nomeF, true)) {
+       file.write("Classifica: \n");
+       posizione = 1;
+       for (Cavallo cavallo : terminanti) {
+        if (cavallo.getTempoFine() != -1 && posizione <= 3) { // Ignora cavalli infortunati
+            file.write(posizione + ". " + cavallo.getNome() + " in: " + cavallo.getTempoFine() + " ms.\n");
+            posizione++;
         }
+    }
+     file.write("\n");
+       System.out.println("Risultati salvati");
+    }   catch (IOException e) {
+    System.out.println("Errore nel salvataggio: " + e.getMessage());
+}
+        
        System.out.println("Fine"); 
        scanner.close();
     }
